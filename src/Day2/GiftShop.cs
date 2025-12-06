@@ -2,24 +2,57 @@ namespace Advent2025.Day2
 {
     public static class GiftShop
     {
-        public static bool IsValidId(long id)
+        public static bool IsValidId(long value, bool onlyUseTwoGroups)
         {
-            //PalindromScheme
-            //<Number><Number>
-            //or
-            //<Number><Digit><Number> valid CodeWord
+            var id = value.ToString();
 
-            var number = id.ToString();
+            var currentSplitAmount = onlyUseTwoGroups ? 2 : id.Length;
 
-            if (number.Length % 2 == 1)
+            while (currentSplitAmount > 1)
             {
-                return true;
+                if (IsInvalidIdPossibleWhenSplitIn(currentSplitAmount, id))
+                {
+                    if (onlyUseTwoGroups)
+                    {
+                        return true;
+                    }
+                    currentSplitAmount--;
+                    continue;
+                }
+
+                if (!SplitIntoGroupsAndCheckIfValid(id, currentSplitAmount))
+                {
+                    return false;
+                }
+
+                currentSplitAmount--;
             }
+            return true;
+        }
 
-            var firstPart = number.Substring(0, number.Length / 2);
-            var secondPart = number.Substring(number.Length / 2);
+        private static bool SplitIntoGroupsAndCheckIfValid(string id, int splitLength)
+        {
+            string previousGroup = id.Substring(0, id.Length / splitLength);
 
-            return firstPart != secondPart;
+            for (int i = 1; i < splitLength; i++)
+            {
+                string nextGroup = id.Substring(
+                    i * (id.Length / splitLength),
+                    id.Length / splitLength
+                );
+
+                if (previousGroup != nextGroup)
+                {
+                    return true;
+                }
+                previousGroup = nextGroup;
+            }
+            return false;
+        }
+
+        private static bool IsInvalidIdPossibleWhenSplitIn(int numberOfGroups, string id)
+        {
+            return id.Length % numberOfGroups != 0;
         }
     }
 }
