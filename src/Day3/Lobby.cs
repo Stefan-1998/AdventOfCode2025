@@ -11,15 +11,21 @@ namespace Advent2025.Day3
                 JoltageRating = joltageRatings ?? throw new ArgumentNullException();
             }
 
-            public int GetMaxJoltageFromTwoBatteries()
+            public long GetMaxJoltage(int batteriesToUse)
             {
-                var batteryRatings = JoltageRating;
-                var firstBattery = batteryRatings[0..(batteryRatings.Length - 1)].ToList().Max();
+                string remainingRatings = JoltageRating;
+                string result = string.Empty;
+                while (batteriesToUse > 0)
+                {
+                    char maxJoltage = remainingRatings[0..(^(batteriesToUse - 1))].Max();
 
-                var positionOfFirstBattery = batteryRatings.ToList().IndexOf(firstBattery);
+                    int maxJoltagePosition = remainingRatings.IndexOf(maxJoltage);
+                    remainingRatings = remainingRatings[(maxJoltagePosition + 1)..];
+                    batteriesToUse--;
 
-                var secondBattery = batteryRatings[(positionOfFirstBattery + 1)..].Max();
-                return int.Parse(firstBattery.ToString() + secondBattery.ToString());
+                    result += maxJoltage.ToString();
+                }
+                return long.Parse(result);
             }
         }
     }
