@@ -7,7 +7,7 @@ namespace Advent2025.Day2
             //PalindromScheme
             //<Number><Number>
             //or
-            //<Number><Digit><Number>
+            //<Number><Digit><Number> valid CodeWord
 
             var number = id.ToString();
 
@@ -15,18 +15,11 @@ namespace Advent2025.Day2
             {
                 return true;
             }
-            var digitIndex = number.Length - 1;
-            if (number.Length % 2 == 0)
-            {
-                while (digitIndex > number.Length / 2 - 1)
-                {
-                    if (number[digitIndex] != number[digitIndex - (number.Length / 2)])
-                        return true;
 
-                    digitIndex--;
-                }
-            }
-            return false;
+            var firstPart = number.Substring(0, number.Length / 2);
+            var secondPart = number.Substring(number.Length / 2);
+
+            return firstPart != secondPart;
         }
     }
 }
