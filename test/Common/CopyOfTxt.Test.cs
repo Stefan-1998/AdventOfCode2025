@@ -1,4 +1,3 @@
-using System.IO;
 using System.Reflection;
 using FluentAssertions;
 
@@ -10,7 +9,8 @@ namespace AdventOfCode.Test.Common
         public void AllTextFilesAreCopiedToOutput()
         {
             var txtFilesInSrc = Directory.GetFiles(
-                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
+                    ?? throw new IOException("Could not resolve src directory"),
                 "*.txt"
             );
             var txtFilesInBin = Directory.GetFiles(".", "*.txt");
