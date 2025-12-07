@@ -57,19 +57,15 @@ namespace Advent2025.Day4
                     .ToList();
             }
 
-            public void RemoveRolls(List<string> accessableRolls)
+            public void RemoveRolls(List<string> idsToRemove)
             {
-                var rollsToDelete = paperRollNeighbourMap.Where(entry =>
-                    accessableRolls.Contains(entry.Key)
-                );
-                var idsToRemove = rollsToDelete.Select(entry => entry.Key).ToList();
-                var neiboursToAdapt = rollsToDelete
-                    .Select(entry => entry.Value)
-                    .SelectMany(list => list)
+                var neiboursIdToAdapt = paperRollNeighbourMap
+                    .Where(entry => entry.Value.Any(x => idsToRemove.Contains(x)))
+                    .Select(x => x.Key)
                     .ToList()
                     .Distinct();
 
-                foreach (var neibourRoll in neiboursToAdapt)
+                foreach (var neibourRoll in neiboursIdToAdapt)
                 {
                     foreach (var idToRemove in idsToRemove)
                     {

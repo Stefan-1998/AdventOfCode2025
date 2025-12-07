@@ -25,6 +25,7 @@ namespace Advent2025.Day4.Test
             PrintingDepartment.PaperRollGrid grid = new(rawGrid);
 
             PrintingDepartment.PaperRollManager manager = new(grid);
+
             long result = 0;
             long oldResult = -1;
 
