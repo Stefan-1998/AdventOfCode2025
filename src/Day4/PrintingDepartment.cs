@@ -23,17 +23,62 @@ namespace Advent2025.Day4
                     }
                 }
             }
+        }
 
-            public IEnumerable<PaperRoll> AccessableByForkLift()
+        public class PaperRollManager
+        {
+            private PaperRollGrid _grid;
+            private Dictionary<string, List<string>> paperRollNeighbourMap;
+
+            public PaperRollManager(PaperRollGrid grid)
             {
-                foreach (PaperRoll roll in PaperRolls)
+                _grid = grid ?? throw new ArgumentNullException();
+                paperRollNeighbourMap = new();
+                CreateConnectionMap();
+            }
+
+            private void CreateConnectionMap()
+            {
+                foreach (var roll in _grid.PaperRolls)
                 {
-                    if (
-                        PaperRolls
-                            .Where(entries => entries.IsCloseTo(roll) && entries != roll)
-                            .Count() < 4
-                    )
-                        yield return roll;
+                    var closeRollIds = _grid
+                        .PaperRolls.Where(neibourRoll => neibourRoll.IsCloseTo(roll))
+                        .Select(neibourRoll => neibourRoll.ID);
+
+                    paperRollNeighbourMap.Add(roll.ID, closeRollIds.ToList());
+                }
+            }
+
+            public List<string> GetAmountOfAccessableRollsByForklift()
+            {
+                return paperRollNeighbourMap
+                    .Where(entry => entry.Value.Count() <= 3)
+                    .Select(x => x.Key)
+                    .ToList();
+            }
+
+            public void RemoveRolls(List<string> accessableRolls)
+            {
+                var rollsToDelete = paperRollNeighbourMap.Where(entry =>
+                    accessableRolls.Contains(entry.Key)
+                );
+                var idsToRemove = rollsToDelete.Select(entry => entry.Key).ToList();
+                var neiboursToAdapt = rollsToDelete
+                    .Select(entry => entry.Value)
+                    .SelectMany(list => list)
+                    .ToList()
+                    .Distinct();
+
+                foreach (var neibourRoll in neiboursToAdapt)
+                {
+                    foreach (var idToRemove in idsToRemove)
+                    {
+                        paperRollNeighbourMap[neibourRoll].Remove(idToRemove);
+                    }
+                }
+                foreach (var idToRemove in idsToRemove)
+                {
+                    paperRollNeighbourMap.Remove(idToRemove);
                 }
             }
         }
@@ -42,6 +87,7 @@ namespace Advent2025.Day4
         {
             public readonly int XPostion;
             public readonly int YPostion;
+            public readonly string ID = Guid.NewGuid().ToString();
 
             public PaperRoll(int x, int y)
             {
@@ -50,7 +96,7 @@ namespace Advent2025.Day4
             }
 
             public bool IsCloseTo(PaperRoll roll) =>
-                IsXPositionClose(roll.XPostion) && IsYPositionClose(roll.YPostion);
+                IsXPositionClose(roll.XPostion) && IsYPositionClose(roll.YPostion) && this != roll;
 
             private bool IsXPositionClose(int x)
             {
