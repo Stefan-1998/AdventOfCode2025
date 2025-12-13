@@ -27,5 +27,16 @@ namespace Advent2025.Day5.Test
             }
             counter.Should().Be(expectation);
         }
+
+        [Theory]
+        [InlineData("Day5/Example.txt", 14)]
+        [InlineData("Day5/Input.txt", 344486348901788)]
+        public void CheckIfRuleRangeIsCorrect(string path, long expectation)
+        {
+            var input = File.ReadAllLines(path);
+
+            Cafeteria.InventoryManagementSystem system = new(input);
+            system.RuleRange.Should().Be(expectation);
+        }
     }
 }
