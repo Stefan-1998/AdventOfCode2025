@@ -1,9 +1,53 @@
+using System.Data;
+
 namespace Advent2025.Day6
 {
     public static class TrashCompactor
     {
         public class MathHomeWork
         {
+            public long SolveSecondPart(List<string> input)
+            {
+                var problems = ParseForSecondSolution(input).ToList();
+                long sumOfResult = 0;
+                foreach (var problem in problems)
+                {
+
+                    var operation = problem.Sign.ToString();
+                    var terms = problem.Terms;
+                    sumOfResult += SolveMathProblem(operation, terms);
+                }
+                return sumOfResult;
+            }
+
+            private IEnumerable<(char Sign, List<string> Terms)> ParseForSecondSolution(List<string> input)
+            {
+                string signLine = input.FirstOrDefault(line => line.Contains('+'))??throw new NoNullAllowedException("Could not find a line containing signs!");
+                char currentSign = signLine[0];
+                List<string> TermList = new();
+
+                for (int i = 0; i < signLine.Length; i++)
+                {
+                    string term = string.Empty;
+                    for (int j = 0; j < input.Count; j++)
+                    {
+                        if (char.IsDigit(input[j][i]))
+                        {
+                            term += input[j][i];
+                        }
+                    }
+                    TermList.Add(term);
+                    if (i+2>signLine.Length||signLine[i+1] == '+' || signLine[i+1] == '*')
+                    {
+                        yield return ((currentSign,TermList));
+                        if(i+2<signLine.Length)
+                            currentSign = signLine[i+1];
+                        TermList = new();
+                        //start of a new calculation
+                    }
+                }
+            }
+
             public long SolveFirstPart(List<string> input)
             {
                 long sumOfResult = 0;
@@ -27,6 +71,10 @@ namespace Advent2025.Day6
                 {
                     foreach (var term in terms)
                     {
+                        if (term == string.Empty)
+                        {
+                            continue;
+                        }
                         result += long.Parse(term.ToString());
                     }
                     return result;
@@ -34,6 +82,10 @@ namespace Advent2025.Day6
                 result = 1;
                 foreach (var term in terms)
                 {
+                    if (term == string.Empty)
+                    {
+                        continue;
+                    }
                     result *= long.Parse(term.ToString());
                 }
                 return result;
