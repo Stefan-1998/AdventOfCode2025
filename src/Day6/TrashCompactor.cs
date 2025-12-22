@@ -24,27 +24,44 @@ namespace Advent2025.Day6
             {
                 string signLine = input.FirstOrDefault(line => line.Contains('+'))??throw new NoNullAllowedException("Could not find a line containing signs!");
                 char currentSign = signLine[0];
-                List<string> TermList = new();
+                List<string> TermList = [];
 
                 for (int i = 0; i < signLine.Length; i++)
                 {
-                    string term = string.Empty;
-                    for (int j = 0; j < input.Count; j++)
+                    ParseTermOfLine(input, TermList, i);
+                    if (IsLastProblem(signLine, i) || IsEndOfProblem(signLine, i))
                     {
-                        if (char.IsDigit(input[j][i]))
-                        {
-                            term += input[j][i];
-                        }
-                    }
-                    TermList.Add(term);
-                    if (i+2>signLine.Length||signLine[i+1] == '+' || signLine[i+1] == '*')
-                    {
-                        yield return ((currentSign,TermList));
-                        if(i+2<signLine.Length)
-                            currentSign = signLine[i+1];
-                        TermList = new();
+                        yield return (currentSign, TermList);
+                        if (i + 2 < signLine.Length)
+                            currentSign = signLine[i + 1];
+                        TermList = [];
                         //start of a new calculation
                     }
+                }
+            }
+            private static bool IsEndOfProblem(string signLine, int i)
+            {
+                return signLine[i + 1] == '+' || signLine[i + 1] == '*';
+            }
+
+            private static bool IsLastProblem(string signLine, int i)
+            {
+                return i + 2 > signLine.Length;
+            }
+
+            private static void ParseTermOfLine(List<string> input, List<string> TermList, int i)
+            {
+                string term = string.Empty;
+                for (int j = 0; j < input.Count; j++)
+                {
+                    if (char.IsDigit(input[j][i]))
+                    {
+                        term += input[j][i];
+                    }
+                }
+                if (term != string.Empty)
+                {
+                    TermList.Add(term);
                 }
             }
 
@@ -66,27 +83,29 @@ namespace Advent2025.Day6
 
             private static long SolveMathProblem(string operation, List<string> terms)
             {
-                long result = 0;
                 if (operation == "+")
                 {
-                    foreach (var term in terms)
-                    {
-                        if (term == string.Empty)
-                        {
-                            continue;
-                        }
-                        result += long.Parse(term.ToString());
-                    }
-                    return result;
+                    return SolveAdditionProblem(terms);
                 }
-                result = 1;
+                return SolveMultiplicationProblem(terms);
+            }
+
+            private static long SolveMultiplicationProblem(List<string> terms)
+            {
+                long result = 1;
                 foreach (var term in terms)
                 {
-                    if (term == string.Empty)
-                    {
-                        continue;
-                    }
                     result *= long.Parse(term.ToString());
+                }
+                return result;
+            }
+
+            private static long SolveAdditionProblem(List<string> terms)
+            {
+                long result = 0;
+                foreach (var term in terms)
+                {
+                    result += long.Parse(term.ToString());
                 }
                 return result;
             }
