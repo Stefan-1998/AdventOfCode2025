@@ -7,7 +7,7 @@ namespace Advent2025.Day8
     {
         public class JunctionBoxGrouper
         {
-            private Vector3[] _jungtionsBoxPositions;
+            private Vector3[] _jungtionsBoxPositions= [];
             public Dictionary<(Vector3 FirstBoxPos, Vector3 SecondBoxPos ), float > boxDistanceMap = [];
             public JunctionBoxGrouper(string[]input)
             {
@@ -30,6 +30,49 @@ namespace Advent2025.Day8
                     groups.ElementAt(2).Count();
             }
 
+            public (Vector3 firstBox, Vector3 secondBox) GetLastCombination()
+            {
+                Dictionary<Vector3, List<Vector3>> circuits = [];
+                foreach (Vector3 circuit in _jungtionsBoxPositions)
+                {
+                    circuits.Add(circuit, new List<Vector3>() { circuit });
+                }
+                return GetLastConnection(circuits);
+
+            }
+            private (Vector3 first, Vector3 second) GetLastConnection(Dictionary<Vector3, List<Vector3>> circuits)
+            {
+                var sortedConnections = boxDistanceMap
+                    .OrderBy(x => x.Value)
+                    .ToArray();
+
+                for (int counter = 0; counter < sortedConnections.Count(); counter++)
+                {
+                    Vector3 firstBox = sortedConnections[counter].Key.FirstBoxPos;
+                    Vector3 secondBox = sortedConnections[counter].Key.SecondBoxPos;
+
+                    // Find the root circuits for both boxes
+                    var firstCircuit = circuits.First(c => c.Value.Contains(firstBox)).Value;
+                    var secondCircuit = circuits.First(c => c.Value.Contains(secondBox)).Value;
+
+                    // Merge circuits if they are not already the same
+                    if (firstCircuit != secondCircuit)
+                    {
+                        firstCircuit.AddRange(secondCircuit);
+                        
+                        if(firstCircuit.Count == _jungtionsBoxPositions.Count())
+                        {
+                            return (firstBox, secondBox);
+                        }
+                        // Update all references to the second circuit
+                        foreach (var box in secondCircuit)
+                        {
+                            circuits[box] = firstCircuit;
+                        }
+                    }
+                }
+                throw new InvalidOperationException("Could not find the last combination");
+            }
             private void ConnectCircuits(int pairsToConnect, Dictionary<Vector3, List<Vector3>> circuits)
             {
                 var sortedConnections = boxDistanceMap

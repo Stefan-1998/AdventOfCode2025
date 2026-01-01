@@ -16,13 +16,13 @@ namespace Advent2025.Day8.Test
 
         [Theory]
         [InlineData("Day8/Example.txt",25272 )]
-        [InlineData("Day8/Input.txt",81536)]
+        [InlineData("Day8/Input.txt",7017750530)]
         public void LastTwoJunctionBoxesGenerateTheCorrectAmount(string path, long expectedResult )
         {
             var input = File.ReadAllLines(Path.GetFullPath(path));
             var grouper = new PlayGround.JunctionBoxGrouper(input);
-            var lastBoxesToConnect = grouper.boxDistanceMap.Last();
-            var distanceFromWall = lastBoxesToConnect.Key.FirstBoxPos.X *lastBoxesToConnect.Key.SecondBoxPos.X;
+            var boxes =grouper.GetLastCombination();
+            long distanceFromWall =(long) (boxes.firstBox.X)*(long) (boxes.secondBox.X);
             distanceFromWall.Should().Be(expectedResult);
         }
     }
